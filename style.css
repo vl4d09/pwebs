@@ -1,0 +1,208 @@
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f8f8f8;
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+header {
+    background-image: url("https://www.publishcentral.com.au/wp-content/uploads/2023/05/book-pile-of-must-read-books-scaled1.jpeg");
+    background-size: cover;
+    background-position: center;
+    color: #fff;
+    padding: 20px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+header h1 {
+    font-size: 2.5em;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+nav {
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 10px;
+    text-align: center;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+}
+
+nav a {
+    color: #fff;
+    text-decoration: none;
+    margin: 0 15px;
+    padding: 8px 15px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+nav a:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+
+header::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+header > * {
+    position: relative;
+    z-index: 1;
+}
+
+nav {
+    background-color: #fff;
+    padding: 10px;
+    text-align: center;
+    box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+nav a {
+    color: #4285f4;
+    text-decoration: none;
+    margin: 0 15px;
+    padding: 5px 10px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+nav a:hover {
+    background-color: #e0e0e0;
+}
+
+section {
+    padding: 30px;
+    margin: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease;
+}
+
+section:hover {
+    transform: translateY(-5px);
+}
+
+
+h2 {
+    color: #4285f4;
+}
+.book {
+    display: inline-block;
+    width: 200px;
+    margin: 10px;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: transform 0.2s ease;
+}
+
+.book:hover {
+    transform: translateY(-5px);
+}
+
+.book img {
+    width: 150px;
+    height: 200px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+}
+
+.book h3 {
+    margin-bottom: 5px;
+}
+
+.book p {
+    font-size: 0.9em;
+    color: #666;
+    margin-bottom: 10px;
+}
+
+.book button {
+    background-color: #4285f4;
+    color: #fff;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.book button:hover {
+    background-color: #357ae8;
+}
+
+#authors ul, #genres ul {
+    list-style: none; 
+    padding: 0;
+    margin: 0;
+}
+
+#authors li, #genres li {
+    display: inline-block; 
+    margin: 0 10px;
+}
+
+
+#authors ul, #genres ul {
+    list-style: none; 
+    margin: 0;
+}
+
+#authors li, #genres li {
+    display: inline-block; 
+    margin: 0 10px;
+}
+
+#authors a, #genres a {
+    text-decoration: none;
+    color: #4285f4; 
+    padding: 5px 10px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+#authors a:hover, #genres a:hover {
+    background-color: #e0e0e0; 
+}
+#authors a, #genres a {
+    text-decoration: none;
+    color: #4285f4; 
+    padding: 5px 10px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+#authors a:hover, #genres a:hover {
+    background-color: #e0e0e0; 
+}
+#authors h2, #genres h2 {
+    color: #333; 
+    font-size: 1.5em;
+    margin-bottom: 10px; 
+}
+
+footer {
+    background-color: #333;
+    color: #fff;
+    padding: 10px;
+    text-align: center;
+    margin-top: auto;
+}
