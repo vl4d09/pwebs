@@ -1,22 +1,34 @@
-# Lab 2 - Landing page
+# Bookstore Landing Page
 
-Create a web page for your/friends/relatives business (example: car-rent, cookies-shop, crypto-scam)
+This project is a simple, yet stylish landing page for a bookstore. Built with vanilla HTML and CSS, it showcases new releases, popular authors, and various genres.
 
-## Customer requirements
+## Features
 
-- Some form of navigation to sections (links, buttons)
-- Call to action
-- At least 4 sections ([see examples](https://webflow.com/blog/high-converting-landing-page))
-- Pleasant to the eyes
+*   Clean and modern design
+*   Hero section with a background image
+*   Sections for new releases, authors, and genres
+*   Contact information
+*   Responsive layout 
+![dashboard](/images/dashboard.png)
+![dashboard](/images/footer.png)
+## Getting Started
 
-## Dev requirements
+1.  Clone the repository: `git clone https://github.com/vl4d09/pwebs.git`
+2.  Open `index.html` in your web browser.
 
-- Use vanilla CSS and HTML (no frameworks)
-- Have a decent git history (no one commit)
-- The page should be deployed on a free hosting service (example: GitHub Pages, Vercel, Netlify)
-- Project repo should have a README with a short description of the landing page topic, screenshots, and a link to the live demo
+## Customization
 
-## Other requirements:
+*   Replace the placeholder images with your own book covers.
+*   Update the content in the different sections (new releases, authors, genres).
+*   Modify the CSS files (`style.css`) to adjust the styling according to your preferences.
 
-- For potential maximal mark, a WIP version should be submitted during the class
-- Use index.html, reset.css
+## Video-Link
+Here is a short video - [click here](https://youtu.be/oIa_nSpklLc)
+
+## Contributing
+
+Feel free to submit pull requests or open issues.
+
+## License
+
+This project is licensed under the MIT License 
