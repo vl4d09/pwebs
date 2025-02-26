@@ -49,7 +49,6 @@ nav a:hover {
     background-color: rgba(255, 255, 255, 0.2);
 }
 
-
 header::before {
     content: "";
     position: absolute;
@@ -98,10 +97,10 @@ section:hover {
     transform: translateY(-5px);
 }
 
-
 h2 {
     color: #4285f4;
 }
+
 .book {
     width: 200px;
     margin: 10px;
@@ -111,10 +110,10 @@ h2 {
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
     text-align: center;
     transition: transform 0.2s ease;
-    display: flex; 
-    flex-direction: column; 
-    align-items: center; 
-    height: 400px; 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 400px;
 }
 
 .book:hover {
@@ -146,68 +145,70 @@ h2 {
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s ease;
-    margin-top: auto; 
+    margin-top: auto;
 }
 
 .book button:hover {
     background-color: #357ae8;
 }
 
-#new {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    font-size: larger;
+#authors {
+    background-color: #e6f7ff;
+    border: 1px solid #91caff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+#authors h2 {
+    color: #1890ff;
+    font-size: 1.8em;
+}
+
+#authors ul li a {
+    color: #1890ff;
+    font-weight: 500;
+}
+
+#genres {
+    background-color: #fff7e6;
+    border: 1px solid #ffe58f;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+#genres h2 {
+    color: #faad14;
+    font-size: 1.8em;
+}
+
+#genres ul li a {
+    color: #957534;
+    font-style: italic;
 }
 
 #authors ul, #genres ul {
-    list-style: none; 
+    list-style: none;
     padding: 0;
     margin: 0;
 }
 
 #authors li, #genres li {
-    display: inline-block; 
-    margin: 0 10px;
-}
-
-
-#authors ul, #genres ul {
-    list-style: none; 
-    margin: 0;
-}
-
-#authors li, #genres li {
-    display: inline-block; 
+    display: inline-block;
     margin: 0 10px;
 }
 
 #authors a, #genres a {
     text-decoration: none;
-    color: #4285f4; 
     padding: 5px 10px;
     border-radius: 5px;
     transition: background-color 0.3s ease;
 }
 
 #authors a:hover, #genres a:hover {
-    background-color: #e0e0e0; 
-}
-#authors a, #genres a {
-    text-decoration: none;
-    color: #4285f4; 
-    padding: 5px 10px;
-    border-radius: 5px;
-    transition: background-color 0.3s ease;
+    background-color: #e0e0e0;
 }
 
-#authors a:hover, #genres a:hover {
-    background-color: #e0e0e0; 
-}
 #authors h2, #genres h2 {
-    color: #333; 
     font-size: 1.5em;
-    margin-bottom: 10px; 
+    margin-bottom: 10px;
 }
 
 #faq {
@@ -217,26 +218,26 @@ h2 {
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     transition: transform 0.2s ease;
-  }
-  
-  #faq h2 {
-    color: #333; 
-    font-size: 1.5em; 
-    margin-bottom: 10px; 
-  }
-  
-  #faq details {
+}
+
+#faq h2 {
+    color: #333;
+    font-size: 1.5em;
+    margin-bottom: 10px;
+}
+
+#faq details {
     margin-bottom: 15px;
-  }
-  
-  #faq summary {
+}
+
+#faq summary {
     font-weight: bold;
     cursor: pointer;
-  }
-  
-  #faq p {
+}
+
+#faq p {
     margin-top: 5px;
-  }
+}
 
 footer {
     background-color: #333;
@@ -244,4 +245,15 @@ footer {
     padding: 10px;
     text-align: center;
     margin-top: auto;
+}
+
+.section-container {
+    width: 100%;
+    display: block;
+}
+
+#new {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
 }
