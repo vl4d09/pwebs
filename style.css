@@ -103,7 +103,6 @@ h2 {
     color: #4285f4;
 }
 .book {
-    display: inline-block;
     width: 200px;
     margin: 10px;
     padding: 15px;
@@ -112,6 +111,10 @@ h2 {
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
     text-align: center;
     transition: transform 0.2s ease;
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    height: 400px; 
 }
 
 .book:hover {
@@ -143,10 +146,18 @@ h2 {
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s ease;
+    margin-top: auto; 
 }
 
 .book button:hover {
     background-color: #357ae8;
+}
+
+#new {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    font-size: larger;
 }
 
 #authors ul, #genres ul {
