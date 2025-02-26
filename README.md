@@ -9,8 +9,7 @@ This project is a simple, yet stylish landing page for a bookstore. Built with v
 *   Sections for new releases, authors, and genres
 *   Contact information
 *   Responsive layout 
-![dashboard](/images/dashboard.png)
-![dashboard](/images/footer.png)
+
 ## Getting Started
 
 1.  Clone the repository: `git clone https://github.com/vl4d09/pwebs.git`
