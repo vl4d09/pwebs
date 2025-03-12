@@ -4,7 +4,7 @@ import re
 from urllib.parse import urlparse, quote
 import ssl
 
-def send_http_request(url):
+def send_http_request(url, max_redirects=5):
     parsed_url = urlparse(url)
     host = parsed_url.netloc
     path = parsed_url.path or '/'
@@ -16,18 +16,38 @@ def send_http_request(url):
         context = ssl.create_default_context()
         s = context.wrap_socket(s, server_hostname=host)
         s.connect((host, 443))
+
         request = f"GET {path} HTTP/1.1\r\nHost: {host}\r\nConnection: close\r\nUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36\r\n\r\n"
         s.sendall(request.encode())
+
         response = b''
         while True:
             data = s.recv(4096)
             if not data:
                 break
             response += data
+
+        response = response.decode()
         s.close()
-        return response.decode()
+
+        status_line = response.split('\r\n')[0]
+        status_code = int(status_line.split(' ')[1])
+
+        if 300 <= status_code < 400 and max_redirects > 0:
+            location = re.search(r'Location: (.*?)\r\n', response).group(1)
+            if not urlparse(location).netloc:
+                base_url = urlparse(url)
+                location = base_url.scheme + "://" + base_url.netloc + location
+            redirect_url = urlparse(location)
+            redirect_host = redirect_url.netloc
+            print(f"Redirecting to: {location}, host: {redirect_host}")
+            return send_http_request(location, max_redirects - 1)
+
+        return response
+
     except Exception as e:
         return f"Error: {e}"
+
 
 def parse_http_response(response):
     try:
