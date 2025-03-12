@@ -1,8 +1,10 @@
+from bs4 import BeautifulSoup
 import sys
 import socket
 import re
 from urllib.parse import urlparse, quote
 import ssl
+import time
 
 def send_http_request(url, max_redirects=5):
     parsed_url = urlparse(url)
@@ -63,13 +65,21 @@ def remove_html_tags(text):
 def search_google(search_term):
     search_term = quote(search_term)
     url = f"https://www.google.com/search?q={search_term}"
+    time.sleep(2) 
     response = send_http_request(url)
     body = parse_http_response(response)
-    results = re.findall(r'<a href="(/url\?q=.*?)"', body)
-    if results:
-        results = [re.search(r'q=(.*?)&', result).group(1) for result in results[:10] if re.search(r'q=(.*?)&', result)]
-    else:
-        results = []
+    soup = BeautifulSoup(body, 'html.parser')
+
+    results = []
+    for link in soup.find_all('a'):
+        href = link.get('href')
+        if href and href.startswith('/url?q='):
+            match = re.search(r'q=(.*?)&', href)
+            if match:
+                results.append(match.group(1))
+        if len(results) >= 10:
+            break
+    print(f"Search results: {results}")
     return results
 
 def main():
@@ -85,7 +95,7 @@ def main():
         body = parse_http_response(response)
         print(remove_html_tags(body))
     elif option == '-s':
-        search_term = sys.argv[2]
+        search_term = ' '.join(sys.argv[2:]) 
         results = search_google(search_term)
         for result in results:
             print(result)
