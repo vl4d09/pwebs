@@ -1,12 +1,18 @@
-from bs4 import BeautifulSoup
 import sys
 import socket
 import re
 from urllib.parse import urlparse, quote
 import ssl
+from bs4 import BeautifulSoup
 import time
+import json
 
-def send_http_request(url, max_redirects=5):
+cache = {}  
+
+def send_http_request(url, max_redirects=5, accept_header="text/html"):
+    if url in cache:
+        return cache[url]  
+
     parsed_url = urlparse(url)
     host = parsed_url.netloc
     path = parsed_url.path or '/'
@@ -19,7 +25,7 @@ def send_http_request(url, max_redirects=5):
         s = context.wrap_socket(s, server_hostname=host)
         s.connect((host, 443))
 
-        request = f"GET {path} HTTP/1.1\r\nHost: {host}\r\nConnection: close\r\nUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36\r\n\r\n"
+        request = f"GET {path} HTTP/1.1\r\nHost: {host}\r\nConnection: close\r\nUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/115.0\r\nAccept: {accept_header}\r\n\r\n"
         s.sendall(request.encode())
 
         response = b''
@@ -40,27 +46,28 @@ def send_http_request(url, max_redirects=5):
             if not urlparse(location).netloc:
                 base_url = urlparse(url)
                 location = base_url.scheme + "://" + base_url.netloc + location
-            redirect_url = urlparse(location)
-            redirect_host = redirect_url.netloc
-            print(f"Redirecting to: {location}, host: {redirect_host}")
-            return send_http_request(location, max_redirects - 1)
+            return send_http_request(location, max_redirects - 1, accept_header)
 
+        cache[url] = response  # Store response in cache
         return response
 
     except Exception as e:
         return f"Error: {e}"
 
-
 def parse_http_response(response):
     try:
         headers, body = response.split('\r\n\r\n', 1)
-        return body
+        content_type = re.search(r'Content-Type: (.*?)\r\n', headers).group(1) if re.search(r'Content-Type: (.*?)\r\n', headers) else "text/html"
+        if "application/json" in content_type:
+            return json.loads(body)
+        else:
+            return body
     except ValueError:
         return response
 
 def remove_html_tags(text):
     clean = re.compile('<.*?>')
-    return re.sub(clean, '', text)
+    return re.sub(clean, '', str(text))
 
 def search_google(search_term):
     search_term = quote(search_term)
@@ -84,23 +91,24 @@ def search_google(search_term):
 
 def main():
     if len(sys.argv) < 2:
-        print("Usage: go2web -u <URL> | -s <search-term> | -h")
+        print("Usage: go2web -u <URL> [-j] | -s <search-term> | -h")
         return
 
     option = sys.argv[1]
 
     if option == '-u':
         url = sys.argv[2]
-        response = send_http_request(url)
+        accept_header = "application/json" if len(sys.argv) > 3 and sys.argv[3] == "-j" else "text/html"
+        response = send_http_request(url, accept_header=accept_header)
         body = parse_http_response(response)
         print(remove_html_tags(body))
     elif option == '-s':
-        search_term = ' '.join(sys.argv[2:]) 
+        search_term = ' '.join(sys.argv[2:])
         results = search_google(search_term)
         for result in results:
             print(result)
     elif option == '-h':
-        print("go2web -u <URL>         # make an HTTP request to the specified URL and print the response")
+        print("go2web -u <URL> [-j]       # make an HTTP request to the specified URL and print the response, -j for json")
         print("go2web -s <search-term> # make an HTTP request to search the term using your favorite search engine and print top 10 results")
         print("go2web -h               # show this help")
     else:
