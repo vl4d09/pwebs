@@ -64,7 +64,17 @@ def main():
         response = send_http_request(url)
         body = parse_http_response(response)
         print(remove_html_tags(body))
-
+    elif option == '-s':
+        search_term = sys.argv[2]
+        results = search_google(search_term)
+        for result in results:
+            print(result)
+    elif option == '-h':
+        print("go2web -u <URL>         # make an HTTP request to the specified URL and print the response")
+        print("go2web -s <search-term> # make an HTTP request to search the term using your favorite search engine and print top 10 results")
+        print("go2web -h               # show this help")
+    else:
+        print("Invalid option")
 
 if __name__ == "__main__":
     main()
