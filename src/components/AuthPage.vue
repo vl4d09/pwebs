@@ -1,5 +1,10 @@
 <template>
-    <div class="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 p-4">
+    <div class="min-h-screen flex flex-col items-center justify-center bg-gray-100 dark:bg-gray-900 p-4">
+      <!-- Theme toggle in top-right corner -->
+      <div class="absolute top-4 right-4">
+        <ThemeToggle />
+      </div>
+      
       <div class="max-w-md w-full bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
         <div class="text-center mb-8">
           <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Welcome to Reminders</h2>
@@ -43,8 +48,13 @@
   </template>
   
   <script>
+  import ThemeToggle from './ui/ThemeToggle.vue';
+  
   export default {
     name: 'AuthPage',
+    components: {
+      ThemeToggle
+    },
     data() {
       return {
         email: '',
@@ -53,7 +63,6 @@
     },
     methods: {
       handleLogin() {
-
         localStorage.setItem('user-authenticated', 'true');
         this.$router.push('/reminders');
       }

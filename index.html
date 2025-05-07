@@ -4,14 +4,24 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Hello World</title>
+  
+  <script>
+
+    const darkMode = localStorage.getItem('darkMode');
+    if (darkMode === 'dark' || (!darkMode && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  </script>
+  
   <!-- Tailwind CSS -->
   <link rel="stylesheet" href="/src/tailwind.css">
 </head>
-<body class="bg-gray-100">
+<body class="bg-gray-100 dark:bg-gray-900">
 
   <div id="app"></div>
 
-  <!-- Include your Vue app script -->
   <script type="module" src="/src/main.js"></script>
 </body>
 </html>
