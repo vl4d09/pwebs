@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import sys
 import socket
 import re
@@ -11,6 +13,9 @@ import hashlib
 import pickle
 from datetime import datetime, timedelta
 import webbrowser  
+import logging
+
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(message)s')
 
 CACHE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "web_cache")
 CACHE_EXPIRY = timedelta(hours=24)  
@@ -51,10 +56,15 @@ def clear_cache():
     else:
         print("No cache to clear.")
 
-def send_http_request(url, max_redirects=5, accept_header="text/html", use_cache=True):
+def send_http_request(url, max_redirects=30, accept_header="text/html", use_cache=True, redirect_chain=None):
+    if redirect_chain is None:
+        redirect_chain = []
+        print(f"Starting request to: {url}")
+    
     if use_cache:
         cached_response = get_from_cache(url)
         if cached_response:
+            logging.debug(f"Cache hit for URL: {url}")
             return cached_response
     
     parsed_url = urlparse(url)
@@ -91,13 +101,18 @@ def send_http_request(url, max_redirects=5, accept_header="text/html", use_cache
         status_line = response.split('\r\n')[0]
         try:
             status_code = int(status_line.split(' ')[1])
+            status_message = ' '.join(status_line.split(' ')[2:])
         except (IndexError, ValueError):
             return f"Error parsing status line: {status_line}"
         
         if 300 <= status_code < 400 and max_redirects > 0:
             location_match = re.search(r'Location: (.*?)\r\n', response)
+        
             if location_match:
                 location = location_match.group(1)
+                redirect_chain.append((url, location, status_code, status_message))
+                print(f"Redirect #{len(redirect_chain)}: {url} → {location} ({status_code} {status_message})")
+                
                 if not urlparse(location).netloc:
                     base_url = parsed_url
                     if location.startswith('/'):
@@ -105,14 +120,19 @@ def send_http_request(url, max_redirects=5, accept_header="text/html", use_cache
                     else:
                         path_parts = base_url.path.split('/')
                         location = f"{scheme}://{base_url.netloc}{'/'.join(path_parts[:-1])}/{location}"
-                return send_http_request(location, max_redirects - 1, accept_header, use_cache)
+                
+                return send_http_request(location, max_redirects - 1, accept_header, use_cache, redirect_chain)
         
+        if redirect_chain:
+            print(f"Final destination reached after {len(redirect_chain)} redirect(s)")
+            
         # Cache the successful response
         if use_cache:
             save_to_cache(url, response)
             
         return response
     except Exception as e:
+        logging.error(f"Error during request to {url}: {e}")
         return f"Error: {e}"
 
 def parse_http_response(response):
@@ -135,7 +155,6 @@ def parse_http_response(response):
         return response
 
 def extract_text_content(html):
-    """Extract readable text content from HTML."""
     soup = BeautifulSoup(html, 'html.parser')
     
     for script_or_style in soup(['script', 'style', 'meta', 'link']):
@@ -166,7 +185,6 @@ def parse_json_data(data):
         return data
 
 def extract_text_between_tags(html, start_tag, end_tag):
-    """Extract text between two HTML tags."""
     pattern = f'{start_tag}(.*?){end_tag}'
     match = re.search(pattern, html, re.DOTALL)
     if match:
@@ -174,7 +192,6 @@ def extract_text_between_tags(html, start_tag, end_tag):
     return None
 
 def search_brave(search_term):
-    """Search using Brave Search."""
     search_term = quote(search_term)
     url = f"https://search.brave.com/search?q={search_term}"
     
@@ -226,7 +243,6 @@ def search_brave(search_term):
     return unique_results[:10]  
 
 def open_in_browser(url):
-    """Open the given URL in the default web browser."""
     try:
         webbrowser.open(url)
         return True
@@ -304,7 +320,7 @@ def main():
             stored_results[i] = url
             print(f"{i}. {title}\n   {url}\n")
             
-        # Allow user to select a result
+        # Allowuser to select a result
         try:
             choice = input("Enter number to open (1-10), add 'b' to open in browser (e.g., '3b'), add 'j' for JSON mode (e.g., '3j'), or press Enter to exit: ")
             
