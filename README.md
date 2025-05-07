@@ -1,22 +1,23 @@
-# Lab 2 - Landing page
+# hello-world
 
-Create a web page for your/friends/relatives business (example: car-rent, cookies-shop, crypto-scam)
+## Project setup
+```
+npm install
+```
 
-## Customer requirements
+### Compiles and hot-reloads for development
+```
+npm run serve
+```
 
-- Some form of navigation to sections (links, buttons)
-- Call to action
-- At least 4 sections ([see examples](https://webflow.com/blog/high-converting-landing-page))
-- Pleasant to the eyes
+### Compiles and minifies for production
+```
+npm run build
+```
 
-## Dev requirements
+### Lints and fixes files
+```
+npm run lint
+```
 
-- Use vanilla CSS and HTML (no frameworks)
-- Have a decent git history (no one commit)
-- The page should be deployed on a free hosting service (example: GitHub Pages, Vercel, Netlify)
-- Project repo should have a README with a short description of the landing page topic, screenshots, and a link to the live demo
 
-## Other requirements:
-
-- For potential maximal mark, a WIP version should be submitted during the class
-- Use index.html, reset.css
