@@ -2,11 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hello World</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+  <title>Reminder-App</title>
   
   <script>
-
     const darkMode = localStorage.getItem('darkMode');
     if (darkMode === 'dark' || (!darkMode && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
       document.documentElement.classList.add('dark');
@@ -15,13 +14,10 @@
     }
   </script>
   
-  <!-- Tailwind CSS -->
   <link rel="stylesheet" href="/src/tailwind.css">
 </head>
 <body class="bg-gray-100 dark:bg-gray-900">
-
   <div id="app"></div>
-
   <script type="module" src="/src/main.js"></script>
 </body>
 </html>

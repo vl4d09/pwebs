@@ -1,56 +1,56 @@
 <template>
-    <div class="min-h-screen flex flex-col bg-gray-100 dark:bg-gray-900">
-      <!-- Header -->
-      <AppHeader title="Reminders" />
-      
-      <!-- Main Content -->
-      <div class="flex-grow">
-        <div class="max-w-4xl mx-auto px-4 pb-20">
-          <!-- Header -->
-          <div class="flex justify-between items-center mb-6">
-            <h2 class="text-2xl font-bold text-gray-800 dark:text-white">My Tasks</h2>
-            <button 
-              @click="showFormModal = true" 
-              class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center"
-            >
-              <span class="mr-1">+</span> New Reminder
-            </button>
+  <div class="min-h-screen flex flex-col bg-gray-100 dark:bg-gray-900">
+    <!-- Header -->
+    <AppHeader title="Reminders" />
+    
+    <!-- Main Content -->
+    <div class="flex-grow">
+      <div class="max-w-4xl mx-auto px-4 pb-20">
+        <!-- Header -->
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+          <h2 class="text-2xl font-bold text-gray-800 dark:text-white">My Tasks</h2>
+          <button 
+            @click="showFormModal = true" 
+            class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center w-full sm:w-auto justify-center sm:justify-start"
+          >
+            <span class="mr-1">+</span> New Reminder
+          </button>
+        </div>
+        
+        <!-- Filters -->
+        <ReminderFilters v-model="filter" />
+        
+        <!-- Task List -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow">
+          <div v-if="filteredTasks.length === 0" class="p-6 text-center text-gray-500 dark:text-gray-400">
+            No reminders to display
           </div>
-          
-          <!-- Filters -->
-          <ReminderFilters v-model="filter" />
-          
-          <!-- Task List -->
-          <div class="bg-white dark:bg-gray-800 rounded-xl shadow">
-            <div v-if="filteredTasks.length === 0" class="p-6 text-center text-gray-500 dark:text-gray-400">
-              No reminders to display
-            </div>
-            <div v-else>
-              <ReminderItem 
-                v-for="task in filteredTasks" 
-                :key="task.id" 
-                :task="task"
-                @toggle-status="toggleTaskStatus"
-                @toggle-priority="toggleTaskPriority"
-                @edit="editTask"
-                @delete="deleteTask"
-              />
-            </div>
+          <div v-else>
+            <ReminderItem 
+              v-for="task in filteredTasks" 
+              :key="task.id" 
+              :task="task"
+              @toggle-status="toggleTaskStatus"
+              @toggle-priority="toggleTaskPriority"
+              @edit="editTask"
+              @delete="deleteTask"
+            />
           </div>
         </div>
       </div>
-      
-      <!-- Footer -->
-      <AppFooter />
-      
-      <!-- Task Form Modal -->
-      <ReminderForm
-        v-model:show="showFormModal"
-        :task="currentTask"
-        @save="saveTask"
-      />
     </div>
-  </template>
+    
+    <!-- Footer -->
+    <AppFooter />
+    
+    <!-- Task Form Modal -->
+    <ReminderForm
+      v-model:show="showFormModal"
+      :task="currentTask"
+      @save="saveTask"
+    />
+  </div>
+</template>
   
   <script>
   import { ref, reactive, onMounted } from 'vue';
