@@ -1,4 +1,3 @@
-// filepath: /Users/vladsmac/Coding/pwebs/src/components/reminders/ReminderForm.vue
 <template>
   <div v-if="show" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto">
     <div class="bg-white dark:bg-gray-800 rounded-lg w-full max-w-md p-4 sm:p-6 mx-2 my-4">
