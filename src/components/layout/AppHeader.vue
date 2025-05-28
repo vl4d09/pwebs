@@ -24,6 +24,9 @@
         <nav class="hidden md:flex items-center space-x-4">
           <router-link to="/home" class="text-gray-700 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400 px-3 py-2 rounded-md">Home</router-link>
           <router-link to="/reminders" class="text-gray-700 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400 px-3 py-2 rounded-md">Reminders</router-link>
+          <div class="text-gray-700 dark:text-gray-300 px-3 py-2" v-if="userData">
+            <span class="text-sm">{{ userData.email }} ({{ userData.role }})</span>
+          </div>
           <ThemeToggle />
           <button @click="logout" class="text-gray-700 dark:text-gray-300 hover:text-red-500 dark:hover:text-red-400 px-3 py-2 rounded-md">Logout</button>
         </nav>
@@ -49,6 +52,9 @@
           >
             Reminders
           </router-link>
+          <div class="px-3 py-2 text-gray-700 dark:text-gray-300" v-if="userData">
+            <span class="text-sm">{{ userData.email }} ({{ userData.role }})</span>
+          </div>
           <div class="flex items-center justify-between px-3 py-2">
             <span class="text-gray-700 dark:text-gray-300">Theme</span>
             <ThemeToggle />
@@ -62,10 +68,25 @@
         </div>
       </div>
     </div>
+    
+    <!-- Token Expiration Alert -->
+    <div v-if="showTokenAlert" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
+      <div class="bg-white dark:bg-gray-800 p-6 rounded-md shadow-lg max-w-sm mx-4">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">Session Expired</h3>
+        <p class="text-gray-700 dark:text-gray-300 mb-4">Your session has expired. Please log in again.</p>
+        <button 
+          @click="handleTokenExpired" 
+          class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-md"
+        >
+          Return to Login
+        </button>
+      </div>
+    </div>
   </header>
 </template>
 
 <script>
+import { ref, onMounted, onBeforeUnmount } from 'vue';
 import ThemeToggle from '../ui/ThemeToggle.vue';
 
 export default {
@@ -79,20 +100,65 @@ export default {
       default: 'Reminders'
     }
   },
-  data() {
-    return {
-      mobileMenuOpen: false
+  setup(props, { emit }) {
+    const mobileMenuOpen = ref(false);
+    const showTokenAlert = ref(false);
+    const userData = ref(null);
+    
+    // Handle JWT token expiration
+    const handleJwtError = (event) => {
+      if (event.detail?.status === 403 || event.detail?.message?.includes('token')) {
+        showTokenAlert.value = true;
+      }
     };
-  },
-  methods: {
-    logout() {
+    
+    onMounted(() => {
+      // Load user data if available
+      try {
+        const userDataString = localStorage.getItem('user-data');
+        if (userDataString) {
+          userData.value = JSON.parse(userDataString);
+        }
+      } catch (err) {
+        console.error('Error parsing user data', err);
+      }
+      
+      // Listen for JWT errors
+      window.addEventListener('jwt-error', handleJwtError);
+    });
+    
+    onBeforeUnmount(() => {
+      window.removeEventListener('jwt-error', handleJwtError);
+    });
+    
+    const logout = () => {
       localStorage.removeItem('user-authenticated');
-      this.$router.push('/auth');
-    },
-    goToHome() {
-      this.$router.push('/home');
-      this.mobileMenuOpen = false;
-    }
+      localStorage.removeItem('auth-token');
+      localStorage.removeItem('user-data');
+      mobileMenuOpen.value = false;
+      window.location.href = '/auth';
+    };
+    
+    const goToHome = () => {
+      mobileMenuOpen.value = false;
+      window.location.href = '/home';
+    };
+    
+    const handleTokenExpired = () => {
+      localStorage.removeItem('user-authenticated');
+      localStorage.removeItem('auth-token');
+      showTokenAlert.value = false;
+      window.location.href = '/auth';
+    };
+    
+    return {
+      mobileMenuOpen,
+      showTokenAlert,
+      userData,
+      logout,
+      goToHome,
+      handleTokenExpired
+    };
   }
 }
 </script>
