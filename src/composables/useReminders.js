@@ -5,57 +5,229 @@ export function useReminders() {
   const { isExpired } = useDateTime();
   const tasks = ref([]);
   const filter = ref('all');
+  const loading = ref(false);
+  const error = ref(null);
+  const pagination = ref({
+    page: 1,
+    limit: 10,
+    totalPages: 0,
+    totalItems: 0
+  });
   
-  // Load tasks from localStorage
-  const loadTasks = () => {
-    const savedTasks = localStorage.getItem('reminder-tasks');
-    if (savedTasks) {
-      tasks.value = JSON.parse(savedTasks);
+  const API_URL = 'http://localhost:5001/api';
+  
+  // Get token from localStorage
+  const getToken = () => {
+    return localStorage.getItem('auth-token');
+  };
+  
+  // Load tasks from API with pagination
+  const loadTasks = async (page = 1, limit = 10) => {
+    loading.value = true;
+    error.value = null;
+    const token = getToken();
+    
+    if (!token) {
+      error.value = 'Authentication required';
+      loading.value = false;
+      return;
+    }
+    
+    try {
+      const response = await fetch(`${API_URL}/reminders?page=${page}&limit=${limit}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (!response.ok) {
+        // Check if it's a token expiration issue
+        if (response.status === 403) {
+          const errorData = await response.json();
+          if (errorData.message && errorData.message.includes('token')) {
+            window.dispatchEvent(new CustomEvent('jwt-error', { 
+              detail: { status: response.status, message: 'Token expired or invalid' }
+            }));
+            return;
+          }
+        }
+        throw new Error(`Failed to load tasks: ${response.statusText}`);
+      }
+      
+      const data = await response.json();
+      tasks.value = data.reminders;
+      pagination.value = {
+        page: data.page,
+        limit: data.limit,
+        totalPages: data.totalPages,
+        totalItems: data.totalItems
+      };
+    } catch (err) {
+      error.value = err.message;
+      console.error('Error loading tasks:', err);
+    } finally {
+      loading.value = false;
     }
   };
   
-  // Save tasks to localStorage
-  const saveTasks = () => {
-    localStorage.setItem('reminder-tasks', JSON.stringify(tasks.value));
-  };
-  
-  // Add new task
-  const addTask = (task) => {
-    const taskId = Date.now().toString();
-    tasks.value.push({
-      ...task,
-      id: taskId,
-    });
-    saveTasks();
-  };
-  
-  // Update existing task
-  const updateTask = (task) => {
-    const index = tasks.value.findIndex(t => t.id === task.id);
-    if (index !== -1) {
-      tasks.value[index] = { ...task };
-      saveTasks();
+  // Add new task via API
+  const addTask = async (task) => {
+    loading.value = true;
+    error.value = null;
+    const token = getToken();
+    
+    if (!token) {
+      error.value = 'Authentication required';
+      loading.value = false;
+      return;
+    }
+    
+    try {
+      const response = await fetch(`${API_URL}/reminders`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(task)
+      });
+      
+      if (!response.ok) {
+        if (response.status === 403) {
+          const errorData = await response.json();
+          if (errorData.message && errorData.message.includes('token')) {
+            window.dispatchEvent(new CustomEvent('jwt-error', { 
+              detail: { status: response.status, message: 'Token expired or invalid' }
+            }));
+            return;
+          }
+        }
+        throw new Error(`Failed to add task: ${response.statusText}`);
+      }
+      
+      const savedTask = await response.json();
+      tasks.value.push(savedTask);
+    } catch (err) {
+      error.value = err.message;
+      console.error('Error adding task:', err);
+    } finally {
+      loading.value = false;
     }
   };
   
-  // Delete a task
-  const deleteTask = (taskId) => {
-    if (confirm('Are you sure you want to delete this task?')) {
-      tasks.value = tasks.value.filter(task => task.id !== taskId);
-      saveTasks();
+  // Update existing task via API
+  const updateTask = async (task) => {
+    loading.value = true;
+    error.value = null;
+    const token = getToken();
+    
+    if (!token) {
+      error.value = 'Authentication required';
+      loading.value = false;
+      return;
+    }
+    
+    try {
+      const response = await fetch(`${API_URL}/reminders/${task._id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(task)
+      });
+      
+      if (!response.ok) {
+        if (response.status === 403) {
+          const errorData = await response.json();
+          if (errorData.message && errorData.message.includes('token')) {
+            window.dispatchEvent(new CustomEvent('jwt-error', { 
+              detail: { status: response.status, message: 'Token expired or invalid' }
+            }));
+            return;
+          }
+        }
+        throw new Error(`Failed to update task: ${response.statusText}`);
+      }
+      
+      const updatedTask = await response.json();
+      const index = tasks.value.findIndex(t => t._id === task._id);
+      if (index !== -1) {
+        tasks.value[index] = updatedTask;
+      }
+    } catch (err) {
+      error.value = err.message;
+      console.error('Error updating task:', err);
+    } finally {
+      loading.value = false;
     }
   };
   
-  // Toggle task status
-  const toggleTaskStatus = (task) => {
-    task.completed = !task.completed;
-    saveTasks();
+  // Delete a task via API
+  const deleteTask = async (taskId) => {
+    if (!confirm('Are you sure you want to delete this task?')) return;
+    
+    loading.value = true;
+    error.value = null;
+    const token = getToken();
+    
+    if (!token) {
+      error.value = 'Authentication required';
+      loading.value = false;
+      return;
+    }
+    
+    try {
+      const response = await fetch(`${API_URL}/reminders/${taskId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (!response.ok) {
+        // Only dispatch JWT error if it's actually a 403 error related to token
+        if (response.status === 403) {
+          const errorData = await response.json();
+          if (errorData.message && errorData.message.includes('token')) {
+            window.dispatchEvent(new CustomEvent('jwt-error', { 
+              detail: { status: response.status, message: 'Token expired or invalid' }
+            }));
+            return;
+          } else {
+            // This is likely a permission error, not a token error
+            throw new Error(errorData.message || 'You do not have permission to delete this item');
+          }
+        } else {
+          throw new Error(`Failed to delete task: ${response.statusText}`);
+        }
+      } else {
+        // Successful delete
+        tasks.value = tasks.value.filter(task => task._id !== taskId);
+      }
+    } catch (err) {
+      error.value = err.message;
+      console.error('Error deleting task:', err);
+    } finally {
+      loading.value = false;
+    }
   };
   
-  // Toggle task priority
-  const toggleTaskPriority = (task) => {
-    task.priority = !task.priority;
-    saveTasks();
+  // Toggle task status and update via API
+  const toggleTaskStatus = async (task) => {
+    const updatedTask = { ...task, completed: !task.completed };
+    await updateTask(updatedTask);
+  };
+  
+  // Toggle task priority and update via API
+  const toggleTaskPriority = async (task) => {
+    const updatedTask = { ...task, priority: !task.priority };
+    await updateTask(updatedTask);
+  };
+  
+  // Change page
+  const changePage = (newPage) => {
+    loadTasks(newPage, pagination.value.limit);
   };
   
   // Sort tasks with priority first
@@ -116,11 +288,15 @@ export function useReminders() {
     tasks,
     filter,
     filteredTasks,
+    loading,
+    error,
+    pagination,
     loadTasks,
     addTask,
     updateTask,
     deleteTask,
     toggleTaskStatus,
-    toggleTaskPriority
+    toggleTaskPriority,
+    changePage
   };
 }
